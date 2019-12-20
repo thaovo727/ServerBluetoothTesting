@@ -4,10 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothServerSocket;
-import android.bluetooth.BluetoothSocket;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.view.View;
 import android.content.Intent;
@@ -18,7 +15,7 @@ import java.util.Set;
 public class MainActivity extends AppCompatActivity {
     BluetoothAdapter bluetoothAdapter;
     int REQUEST_ENABLE_BT = 0;
-    private final BluetoothServerSocket mmServerSocket;
+   // private final BluetoothServerSocket mmServerSocket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
             Intent enableIntent = new Intent (BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
         }
-        Set<BluetoothDevice> pairedDevices = BluetoothAdapter.getBondedDevices();
+        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
 
         if(pairedDevices.size()>0)
 
@@ -39,18 +36,37 @@ public class MainActivity extends AppCompatActivity {
             for (BluetoothDevice device : pairedDevices) {
                 String deviceName = device.getName();
                 String deviceHardwareAddress = device.getAddress(); // MAC address
+
             }
         }
 
+        final AcceptThread thread = new AcceptThread(bluetoothAdapter);
 
-
-        /*Button start_bluetooth = findViewById(R.id.button);
-        start_bluetooth.setOnClickListener(new View.OnClickListener() {
+        Button start = findViewById(R.id.start);
+        start.setOnClickListener(new View.OnClickListener(){
             @Override
-            public void onClick(View v) {
-                StartBluetooth();
+            public void onClick(View v){
+                try {
+                    thread.run();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-        }*/
+        });
+        Button stop = findViewById(R.id.stop);
+        stop.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                try {
+                    thread.run();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        thread.cancel();
+
     }
 
 }
